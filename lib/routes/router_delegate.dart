@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:puth_story/db/auth_repository.dart';
 import 'package:puth_story/model/page_configuration.dart';
 import 'package:puth_story/screen/home.dart';
 
