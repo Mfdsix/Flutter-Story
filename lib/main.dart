@@ -1,52 +1,68 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:puth_story/data/api/dicoding_story_service.dart';
+import 'package:puth_story/data/db/auth_repository.dart';
+import 'package:puth_story/provider/auth_provider.dart';
+import 'package:puth_story/routes/route_information_parser.dart';
+import 'package:puth_story/routes/router_delegate.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
   static const appTitle = "Puth Story";
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    switch(defaultTargetPlatform){
-      case TargetPlatform.iOS:
-        return iOSScaffold(context, const Text("hallo"));
-      default:
-        return androidScaffold(context, const Text("hello android"));
-    }
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  late MyRouterDelegate myRouterDelegate;
+  late MyRouteInformationParser myRouteInformationParser;
+  late AuthProvider authProvider;
+
+  @override
+  void initState() {
+    final authRepository = AuthRepository();
+    final apiService = DicodingStoryService();
+
+    authProvider = AuthProvider(authRepository: authRepository, apiService: apiService);
+    myRouterDelegate = MyRouterDelegate(authRepository);
+    myRouteInformationParser = MyRouteInformationParser();
+
+    super.initState();
   }
 
-  Widget iOSScaffold(BuildContext context, Widget child){
-    return CupertinoApp(
-      home: CupertinoPageScaffold(
-        backgroundColor: Colors.grey,
-        navigationBar: const CupertinoNavigationBar(
-          middle: Text(appTitle),
-        ),
-        child: child,
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => authProvider,
+      child: defaultTargetPlatform == TargetPlatform.iOS
+        ? iOSScaffold()
+          : androidScaffold()
     );
   }
 
-  Widget androidScaffold(BuildContext context, Widget child){
-    return MaterialApp(
-      home: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(100.0),
-            child: AppBar(
-              centerTitle: true,
-              toolbarHeight: 150,
-              title: const Text(appTitle),
-            ),
-          ),
-          body: child
-      ),
+  Widget iOSScaffold(){
+    return CupertinoApp.router(
+      title: MyApp.appTitle,
+      routerDelegate: myRouterDelegate,
+      routeInformationParser: myRouteInformationParser,
+      backButtonDispatcher: RootBackButtonDispatcher()
+    );
+  }
+
+  Widget androidScaffold(){
+    return MaterialApp.router(
+      title: MyApp.appTitle,
+      routerDelegate: myRouterDelegate,
+      routeInformationParser: myRouteInformationParser,
+      backButtonDispatcher: RootBackButtonDispatcher(),
     );
   }
 }

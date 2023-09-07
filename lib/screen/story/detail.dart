@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-class UnknownPage extends StatelessWidget {
-  const UnknownPage({super.key});
+class DetailStoryPage extends StatelessWidget {
+  const DetailStoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {

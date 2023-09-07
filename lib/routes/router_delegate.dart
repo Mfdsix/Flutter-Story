@@ -1,9 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:puth_story/db/auth_repository.dart';
+import 'package:puth_story/data/db/auth_repository.dart';
 import 'package:puth_story/model/page_configuration.dart';
+import 'package:puth_story/screen/auth/login.dart';
+import 'package:puth_story/screen/auth/register.dart';
 import 'package:puth_story/screen/home.dart';
+import 'package:puth_story/screen/splash.dart';
+import 'package:puth_story/screen/story/add.dart';
+import 'package:puth_story/screen/story/detail.dart';
+import 'package:puth_story/screen/unknown.dart';
 
 class MyRouterDelegate extends RouterDelegate<PageConfiguration> with ChangeNotifier, PopNavigatorRouterDelegateMixin{
   final GlobalKey<NavigatorState> _navigatorKey;
@@ -29,11 +35,20 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration> with ChangeNoti
   bool isRegister = false;
   bool isCreateStory = false;
 
-  List<Page> get _unknownStack => [];
-  List<Page> get _splashStack => [];
-  List<Page> get _loggedOutStack => [];
+  List<Page> get _unknownStack => [
+    _platformPage("unknownPage", const UnknownPage())
+  ];
+  List<Page> get _splashStack => [
+    _platformPage("splashPage", const SplashPage())
+  ];
+  List<Page> get _loggedOutStack => [
+    _platformPage("loginPage", const LoginPage()),
+    if(isRegister == true) _platformPage("registerPage", const RegisterPage())
+  ];
   List<Page> get _loggedInStack => [
     _platformPage("homePage", const HomePage()),
+    if(isCreateStory == true) _platformPage("createStoryPage", const StoryAddPage()),
+    if(isCreateStory == false && selectedStoryId != null) _platformPage("detailStoryPage", const DetailStoryPage())
   ];
 
   @override
@@ -51,9 +66,18 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration> with ChangeNoti
 
     return Navigator(
       key: navigatorKey,
-      pages: [
-        _platformPage("homePage", const HomePage())
-      ]
+      pages: historyStack,
+      onPopPage: (route, result) {
+        final didPop = route.didPop(result);
+
+        if(!didPop) return false;
+
+        isRegister = false;
+        selectedStoryId = null;
+        notifyListeners();
+
+        return true;
+      },
     );
   }
 

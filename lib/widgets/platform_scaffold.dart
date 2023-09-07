@@ -20,8 +20,14 @@ class PlatformScaffold extends StatelessWidget {
 
   Widget _androidScaffold() {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100.0),
+        child: AppBar(
+          centerTitle: true,
+          toolbarHeight: 150,
+          title: Text(title),
+        ),
       ),
       body: SafeArea(child: child),
     );
@@ -29,6 +35,7 @@ class PlatformScaffold extends StatelessWidget {
 
   Widget _iOSScaffold() {
     return CupertinoPageScaffold(
+      backgroundColor: Colors.grey,
       navigationBar: CupertinoNavigationBar(
         middle: Text(title),
       ),
