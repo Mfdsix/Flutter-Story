@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/login.dart';
-import 'package:puth_story/provider/AuthProvider.dart';
+import 'package:puth_story/provider/auth_provider.dart';
 import 'package:puth_story/utils/validator.dart';
 import 'package:puth_story/widgets/platform_alert.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/register.dart';
-import 'package:puth_story/provider/AuthProvider.dart';
+import 'package:puth_story/provider/auth_provider.dart';
 import 'package:puth_story/utils/validator.dart';
 import 'package:puth_story/widgets/platform_alert.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';
