@@ -80,9 +80,18 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
             isCreateStory = true;
             notifyListeners();
           },
+          onLogout: () {
+            isLoggedIn = false;
+            notifyListeners();
+          },
         )),
         if (isCreateStory == true)
-          _platformPage("createStoryPage", const StoryAddPage()),
+          _platformPage("createStoryPage", StoryAddPage(
+            onUploaded: () {
+              isCreateStory = false;
+              notifyListeners();
+            },
+          )),
         if (isCreateStory == false && selectedStoryId != null)
           _platformPage(
             "detailStoryPage",

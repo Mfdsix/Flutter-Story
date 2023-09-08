@@ -10,8 +10,9 @@ import 'package:puth_story/widgets/v_margin.dart';
 class HomePage extends StatefulWidget {
   final Function(String) onClickItem;
   final Function() onCreate;
+  final Function() onLogout;
 
-  const HomePage({super.key, required this.onClickItem, required this.onCreate});
+  const HomePage({super.key, required this.onClickItem, required this.onCreate, required this.onLogout});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -29,7 +30,16 @@ class _HomePageState extends State<HomePage> {
         title: "Puth Story", child:
         Column(
           children: [
-            ElevatedButton(onPressed: widget.onCreate, child: const Text("Create Story")),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(onPressed: widget.onCreate, child: const Text("Create Story")),
+                OutlinedButton(onPressed: () async {
+                  await authProvider.logout();
+                  widget.onLogout();
+                }, child: const Text("Logout")),
+              ]
+            ),
             const VMargin(
               height: 16.0,
             ),

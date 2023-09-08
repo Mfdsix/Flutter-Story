@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:puth_story/data/api/dicoding_story_service.dart';
 import 'package:puth_story/model/api/get_all_story.dart';
 import 'package:puth_story/model/api/detail_story.dart' as detail;
+import 'package:puth_story/model/api/post_story.dart';
 import 'package:puth_story/utils/result_state.dart';
 
 class StoryProvider extends ChangeNotifier{
@@ -47,5 +48,14 @@ class StoryProvider extends ChangeNotifier{
     }
 
     notifyListeners();
+  }
+
+  Future<dynamic> postStory(String token, PostStoryFileRequest fileBody, PostStoryBodyRequest body) async {
+    state = ResultState.loading;
+    notifyListeners();
+
+    final response = await apiService.postStory(token, fileBody, body);
+
+    return response;
   }
 }
