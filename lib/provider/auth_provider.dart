@@ -8,13 +8,16 @@ class AuthProvider extends ChangeNotifier {
   final AuthRepository authRepository;
   final DicodingStoryService apiService;
 
-  AuthProvider({required this.authRepository, required this.apiService});
+  AuthProvider({required this.authRepository, required this.apiService}){
+    _getUser();
+  }
 
   bool isLoadingLogin = false;
   bool isLoadingLogout = false;
   bool isLoadingRegister = false;
   String message = "";
   bool isLoggedIn = false;
+  User? user;
 
   Future<bool> login(LoginRequest reqBody) async {
     isLoadingLogin = true;
@@ -31,6 +34,12 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     return isLoggedIn;
+  }
+
+  Future _getUser() async {
+    final response = await authRepository.getUser();
+    user = response;
+    notifyListeners();
   }
 
   Future<bool> register(RegisterRequest reqBody) async {

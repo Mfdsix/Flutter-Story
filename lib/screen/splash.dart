@@ -1,10 +1,12 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Text("splash screen");
+    return Center(
+      child: Text("Puth Story", style: Theme.of(context).textTheme.titleLarge,),
+    );
   }
 }

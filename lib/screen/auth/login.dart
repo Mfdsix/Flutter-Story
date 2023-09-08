@@ -8,7 +8,11 @@ import 'package:puth_story/widgets/platform_scaffold.dart';
 import 'package:puth_story/widgets/v_margin.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+
+  final Function() onLogin;
+  final Function() onRegister;
+
+  const LoginPage({super.key, required this.onLogin, required this.onRegister});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -82,12 +86,13 @@ class _LoginPageState extends State<LoginPage> {
                       final result = await context.read<AuthProvider>().login(reqBody);
 
                       if(result){
-                        // after login
+                        widget.onLogin();
                       }else{
                         showPlatformAlert(context, "Email or Password is not correct");
                       }
                     }
-              }, child: const Text("Login"))
+              }, child: const Text("Login"),),
+              OutlinedButton(onPressed: () => widget.onRegister, child: const Text("Register"))
             ],
           ),
         ));

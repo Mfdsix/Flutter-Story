@@ -11,14 +11,16 @@ import 'package:puth_story/screen/story/add.dart';
 import 'package:puth_story/screen/story/detail.dart';
 import 'package:puth_story/screen/unknown.dart';
 
-class MyRouterDelegate extends RouterDelegate<PageConfiguration> with ChangeNotifier, PopNavigatorRouterDelegateMixin{
+class MyRouterDelegate extends RouterDelegate<PageConfiguration>
+    with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   final GlobalKey<NavigatorState> _navigatorKey;
   final AuthRepository authRepository;
 
   bool? isUnknown;
   String? selectedStoryId;
 
-  MyRouterDelegate(this.authRepository): _navigatorKey = GlobalKey<NavigatorState>(){
+  MyRouterDelegate(this.authRepository)
+      : _navigatorKey = GlobalKey<NavigatorState>() {
     _init();
   }
 
@@ -36,25 +38,63 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration> with ChangeNoti
   bool isCreateStory = false;
 
   List<Page> get _unknownStack => [
-    _platformPage("unknownPage", const UnknownPage())
-  ];
-  List<Page> get _splashStack => [
-    _platformPage("splashPage", const SplashPage())
-  ];
+        _platformPage("unknownPage", UnknownPage(
+          onBack: () {
+            isUnknown = false;
+          },
+        ))
+      ];
+  List<Page> get _splashStack =>
+      [_platformPage("splashPage", const SplashPage())];
   List<Page> get _loggedOutStack => [
-    _platformPage("loginPage", const LoginPage()),
-    if(isRegister == true) _platformPage("registerPage", const RegisterPage())
-  ];
+        _platformPage(
+            "loginPage",
+            LoginPage(onLogin: () {
+              isLoggedIn = true;
+              notifyListeners();
+            }, onRegister: () {
+              isRegister = true;
+              notifyListeners();
+            })),
+        if (isRegister == true)
+          _platformPage(
+              "registerPage",
+              RegisterPage(
+                onRegister: () {
+                  isRegister = false;
+                  notifyListeners();
+                },
+                onLogin: () {
+                  isRegister = false;
+                  notifyListeners();
+                },
+              ))
+      ];
   List<Page> get _loggedInStack => [
-    _platformPage("homePage", const HomePage()),
-    if(isCreateStory == true) _platformPage("createStoryPage", const StoryAddPage()),
-    if(isCreateStory == false && selectedStoryId != null) _platformPage("detailStoryPage", const DetailStoryPage())
-  ];
+        _platformPage("homePage", HomePage(
+          onClickItem: (String storyId) {
+            selectedStoryId = storyId;
+            notifyListeners();
+          },
+          onCreate: () {
+            isCreateStory = true;
+            notifyListeners();
+          },
+        )),
+        if (isCreateStory == true)
+          _platformPage("createStoryPage", const StoryAddPage()),
+        if (isCreateStory == false && selectedStoryId != null)
+          _platformPage(
+            "detailStoryPage",
+            DetailStoryPage(
+              storyId: selectedStoryId!,
+            ),
+          )
+      ];
 
   @override
-  Widget build(BuildContext context){
-
-    if(isUnknown == true){
+  Widget build(BuildContext context) {
+    if (isUnknown == true) {
       historyStack = _unknownStack;
     } else if (isLoggedIn == null) {
       historyStack = _splashStack;
@@ -70,7 +110,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration> with ChangeNoti
       onPopPage: (route, result) {
         final didPop = route.didPop(result);
 
-        if(!didPop) return false;
+        if (!didPop) return false;
 
         isRegister = false;
         selectedStoryId = null;
@@ -104,29 +144,31 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration> with ChangeNoti
 
   @override
   Future<void> setNewRoutePath(PageConfiguration configuration) async {
-    if(configuration.isUnknownPage){
+    if (configuration.isUnknownPage) {
       isUnknown = true;
       isRegister = false;
-    }else if(configuration.isRegisterPage){
+    } else if (configuration.isRegisterPage) {
       isRegister = true;
-    }else if(configuration.isHomePage || configuration.isLoginPage || configuration.isSplashPage){
+    } else if (configuration.isHomePage ||
+        configuration.isLoginPage ||
+        configuration.isSplashPage) {
       isUnknown = false;
       selectedStoryId = null;
       isRegister = false;
-    }else if(configuration.isCreateStoryPage){
+    } else if (configuration.isCreateStoryPage) {
       selectedStoryId = null;
       isCreateStory = true;
-    }else if(configuration.isDetailStoryPage){
+    } else if (configuration.isDetailStoryPage) {
       selectedStoryId = configuration.storyId.toString();
-    }else{
+    } else {
       print("New route is invalid");
     }
 
     notifyListeners();
   }
 
-  Page<dynamic> _platformPage(String routeKey, Widget child){
-    switch(defaultTargetPlatform){
+  Page<dynamic> _platformPage(String routeKey, Widget child) {
+    switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
         return CupertinoPage(
           key: ValueKey(routeKey),

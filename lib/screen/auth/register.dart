@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/register.dart';
 import 'package:puth_story/provider/auth_provider.dart';
@@ -9,7 +8,10 @@ import 'package:puth_story/widgets/platform_scaffold.dart';
 import 'package:puth_story/widgets/v_margin.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final Function() onRegister;
+  final Function() onLogin;
+
+  const RegisterPage({super.key, required this.onRegister, required this.onLogin});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -39,7 +41,7 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           children: [
             Text(
-              "Login",
+              "Register",
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const VMargin(),
@@ -104,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             .register(reqBody);
 
                         if (result) {
-                          // to login
+                          widget.onRegister();
                         } else {
                           showPlatformAlert(context, "Registration Failed");
                         }
@@ -112,6 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                     child: const Text("Register"),
                   ),
+            OutlinedButton(onPressed: () => widget.onLogin, child: const Text("Login"))
           ],
         ),
       ),
