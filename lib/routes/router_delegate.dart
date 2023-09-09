@@ -59,54 +59,60 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
             }, onRegister: () {
               isRegister = true;
               notifyListeners();
+            }, onError: (String message) {
+              alertMessage = message;
+              notifyListeners();
             })),
         if (isRegister == true)
           _platformPage(
               "registerPage",
-              RegisterPage(
-                onRegister: () {
-                  isRegister = false;
-                  notifyListeners();
-                },
-                onLogin: () {
-                  isRegister = false;
-                  notifyListeners();
-                },
-              )),
-        if(alertMessage != null)
-          PlatformAlert(message: alertMessage!),
+              RegisterPage(onRegister: () {
+                isRegister = false;
+                notifyListeners();
+              }, onLogin: () {
+                isRegister = false;
+                notifyListeners();
+              }, onError: (String message) {
+                alertMessage = message;
+                notifyListeners();
+              })),
+        if (alertMessage != null) PlatformAlert(message: alertMessage!),
       ];
   List<Page> get _loggedInStack => [
-        _platformPage("homePage", HomePage(
-          onClickItem: (String storyId) {
-            selectedStoryId = storyId;
-            notifyListeners();
-          },
-          onCreate: () {
-            isCreateStory = true;
-            notifyListeners();
-          },
-          onLogout: () {
-            isLoggedIn = false;
-            notifyListeners();
-          },
-        )),
-        if(isCamera == true)
+        _platformPage(
+            "homePage",
+            HomePage(
+              onClickItem: (String storyId) {
+                selectedStoryId = storyId;
+                notifyListeners();
+              },
+              onCreate: () {
+                isCreateStory = true;
+                notifyListeners();
+              },
+              onLogout: () {
+                isLoggedIn = false;
+                notifyListeners();
+              },
+            )),
+        if (isCamera == true)
           _platformPage("cameraPage", CameraPage(onSend: () {
             isCamera = false;
             notifyListeners();
           })),
         if (isCreateStory == true)
-          _platformPage("createStoryPage", StoryAddPage(
-            onOpenCamera: (){
-              isCamera = true;
-              notifyListeners();
-            },
-            onUploaded: () {
-              isCreateStory = false;
-              notifyListeners();
-            },
-          )),
+          _platformPage(
+              "createStoryPage",
+              StoryAddPage(
+                onOpenCamera: () {
+                  isCamera = true;
+                  notifyListeners();
+                },
+                onUploaded: () {
+                  isCreateStory = false;
+                  notifyListeners();
+                },
+              )),
         if (isCreateStory == false && selectedStoryId != null)
           _platformPage(
             "detailStoryPage",

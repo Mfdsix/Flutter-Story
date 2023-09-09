@@ -3,15 +3,15 @@ import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/register.dart';
 import 'package:puth_story/provider/auth_provider.dart';
 import 'package:puth_story/utils/validator.dart';
-import 'package:puth_story/widgets/platform_alert.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';
 import 'package:puth_story/widgets/v_margin.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function() onRegister;
   final Function() onLogin;
+  final Function(String message) onError;
 
-  const RegisterPage({super.key, required this.onRegister, required this.onLogin});
+  const RegisterPage({super.key, required this.onRegister, required this.onLogin, required this.onError});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -109,7 +109,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         if (result) {
                           widget.onRegister();
                         } else {
-                          showPlatformAlert(context, "Registration Failed");
+                          widget.onError("Registration Failed");
                         }
                       }
                     },

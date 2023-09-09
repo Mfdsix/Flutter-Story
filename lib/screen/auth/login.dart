@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/login.dart';
 import 'package:puth_story/provider/auth_provider.dart';
 import 'package:puth_story/utils/validator.dart';
-import 'package:puth_story/widgets/platform_alert.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';
 import 'package:puth_story/widgets/v_margin.dart';
 
@@ -11,8 +10,9 @@ class LoginPage extends StatefulWidget {
 
   final Function() onLogin;
   final Function() onRegister;
+  final Function(String message) onError;
 
-  const LoginPage({super.key, required this.onLogin, required this.onRegister});
+  const LoginPage({super.key, required this.onLogin, required this.onRegister, required this.onError});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                       if(result){
                         widget.onLogin();
                       }else{
-                        showPlatformAlert(context, "Email or Password is not correct");
+                        widget.onError("Wrong Email or Password");
                       }
                     }
               }, child: const Text("Login"),),
