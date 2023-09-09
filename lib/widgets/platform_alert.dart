@@ -2,7 +2,31 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-Future<void> showPlatformAlert(BuildContext context, String message){
+
+class PlatformAlert extends Page{
+  final String message;
+
+  const PlatformAlert({
+    super.key,
+    required this.message
+  });
+
+  @override
+  Route createRoute(BuildContext context) {
+    return CupertinoDialogRoute(
+      settings: this,
+      barrierDismissible: true,
+      barrierColor: Colors.black87,
+      builder: (BuildContext context) {
+        return Text(message);
+      },
+      context: context,
+    );
+  }
+}
+
+
+Future<void> _oldshowPlatformAlert(BuildContext context, String message){
   switch(defaultTargetPlatform){
     case TargetPlatform.iOS:
       return showCupertinoDialog(context: context, builder: (context) => CupertinoAlertDialog(

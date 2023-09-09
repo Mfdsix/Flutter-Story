@@ -11,6 +11,7 @@ import 'package:puth_story/screen/splash.dart';
 import 'package:puth_story/screen/story/add.dart';
 import 'package:puth_story/screen/story/detail.dart';
 import 'package:puth_story/screen/unknown.dart';
+import 'package:puth_story/widgets/platform_alert.dart';
 
 class MyRouterDelegate extends RouterDelegate<PageConfiguration>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
@@ -20,6 +21,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
   bool? isUnknown;
   bool isCamera = false;
   String? selectedStoryId;
+  String? alertMessage;
 
   MyRouterDelegate(this.authRepository)
       : _navigatorKey = GlobalKey<NavigatorState>() {
@@ -70,7 +72,9 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
                   isRegister = false;
                   notifyListeners();
                 },
-              ))
+              )),
+        if(alertMessage != null)
+          PlatformAlert(message: alertMessage!),
       ];
   List<Page> get _loggedInStack => [
         _platformPage("homePage", HomePage(
