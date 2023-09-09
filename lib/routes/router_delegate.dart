@@ -5,6 +5,7 @@ import 'package:puth_story/data/db/auth_repository.dart';
 import 'package:puth_story/model/page_configuration.dart';
 import 'package:puth_story/screen/auth/login.dart';
 import 'package:puth_story/screen/auth/register.dart';
+import 'package:puth_story/screen/camera.dart';
 import 'package:puth_story/screen/home.dart';
 import 'package:puth_story/screen/splash.dart';
 import 'package:puth_story/screen/story/add.dart';
@@ -17,6 +18,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
   final AuthRepository authRepository;
 
   bool? isUnknown;
+  bool isCamera = false;
   String? selectedStoryId;
 
   MyRouterDelegate(this.authRepository)
@@ -85,8 +87,17 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
             notifyListeners();
           },
         )),
+        if(isCamera == true)
+          _platformPage("cameraPage", CameraPage(onSend: () {
+            isCamera = false;
+            notifyListeners();
+          })),
         if (isCreateStory == true)
           _platformPage("createStoryPage", StoryAddPage(
+            onOpenCamera: (){
+              isCamera = true;
+              notifyListeners();
+            },
             onUploaded: () {
               isCreateStory = false;
               notifyListeners();
@@ -123,6 +134,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
 
         isRegister = false;
         selectedStoryId = null;
+        isCamera = false;
         notifyListeners();
 
         return true;

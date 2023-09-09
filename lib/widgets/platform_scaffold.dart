@@ -29,7 +29,11 @@ class PlatformScaffold extends StatelessWidget {
           title: Text(title),
         ),
       ),
-      body: SafeArea(child: child),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: child,
+        ),
+      ),
     );
   }
 

@@ -1,10 +1,12 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:puth_story/routes/page_manager.dart';
 
 class CameraPage extends StatefulWidget {
-  final List<CameraDescription> cameras;
+  final Function() onSend;
 
-  const CameraPage({super.key, required this.cameras});
+  const CameraPage({super.key, required this.onSend});
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -15,11 +17,14 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   bool _isCameraInitialized = false;
   CameraController? controller;
   bool _isBackCameraSelected = true;
+  List<CameraDescription> cameras = [];
 
   @override
-  void initState() {
+  void initState() async {
+    cameras = await availableCameras();
+
     WidgetsBinding.instance.addObserver(this);
-    onNewCameraSelected(widget.cameras.first);
+    onNewCameraSelected(cameras.first);
 
     super.initState();
   }
@@ -112,21 +117,25 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   }
 
   Future<void> _onCameraButtonClick() async {
-    final navigator = Navigator.of(context);
     final image = await controller?.takePicture();
 
-    navigator.pop(image);
+    widget.onSend();
+    _returnData(image);
+  }
+
+  void _returnData(XFile? image) async {
+    context.read<PageManager>().returnData(image);
   }
 
   void _onCameraSwitch() {
-    if (widget.cameras.length == 1) return;
+    if (cameras.length == 1) return;
 
     setState(() {
       _isCameraInitialized = false;
     });
 
     onNewCameraSelected(
-      widget.cameras[_isBackCameraSelected ? 1 : 0],
+      cameras[_isBackCameraSelected ? 1 : 0],
     );
 
     setState(() {

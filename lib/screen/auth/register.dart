@@ -76,6 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
             const VMargin(),
             TextFormField(
               controller: passwordController,
+              obscureText: true,
               decoration: const InputDecoration(hintText: "Password"),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -114,7 +115,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                     child: const Text("Register"),
                   ),
-            OutlinedButton(onPressed: () => widget.onLogin, child: const Text("Login"))
+            OutlinedButton(onPressed: widget.onLogin, child: const Text("Login"))
           ],
         ),
       ),

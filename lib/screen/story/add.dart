@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/post_story.dart';
 import 'package:puth_story/provider/auth_provider.dart';
 import 'package:puth_story/provider/story_provider.dart';
+import 'package:puth_story/routes/page_manager.dart';
 import 'package:puth_story/screen/camera.dart';
 import 'package:puth_story/utils/image_compress.dart';
 import 'package:puth_story/utils/result_state.dart';
@@ -14,9 +14,10 @@ import 'package:puth_story/widgets/platform_scaffold.dart';
 import 'package:puth_story/widgets/v_margin.dart';
 
 class StoryAddPage extends StatefulWidget {
+  final Function() onOpenCamera;
   final Function() onUploaded;
 
-  const StoryAddPage({super.key, required this.onUploaded});
+  const StoryAddPage({super.key, required this.onOpenCamera, required this.onUploaded});
 
   @override
   State<StoryAddPage> createState() => _StoryAddPageState();
@@ -127,16 +128,8 @@ class _StoryAddPageState extends State<StoryAddPage> {
   }
 
   _onCameraView() async {
-    final navigator = Navigator.of(context);
-    final cameras = await availableCameras();
-
-    final XFile? resultImageFile = await navigator.push(
-      MaterialPageRoute(
-        builder: (context) => CameraPage(
-          cameras: cameras,
-        ),
-      ),
-    );
+    widget.onOpenCamera();
+    final XFile? resultImageFile = await context.read<PageManager>().waitForResult();
 
     if (resultImageFile != null) {
       setState(() {

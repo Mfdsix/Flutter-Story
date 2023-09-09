@@ -6,6 +6,7 @@ import 'package:puth_story/data/api/dicoding_story_service.dart';
 import 'package:puth_story/data/db/auth_repository.dart';
 import 'package:puth_story/provider/auth_provider.dart';
 import 'package:puth_story/provider/story_provider.dart';
+import 'package:puth_story/routes/page_manager.dart';
 import 'package:puth_story/routes/route_information_parser.dart';
 import 'package:puth_story/routes/router_delegate.dart';
 
@@ -27,6 +28,7 @@ class _MyAppState extends State<MyApp> {
   late MyRouteInformationParser myRouteInformationParser;
   late AuthProvider authProvider;
   late StoryProvider storyProvider;
+  late PageManager pageManager;
 
   @override
   void initState() {
@@ -35,6 +37,7 @@ class _MyAppState extends State<MyApp> {
 
     authProvider = AuthProvider(authRepository: authRepository, apiService: apiService);
     storyProvider = StoryProvider(apiService: apiService);
+    pageManager = PageManager();
 
     myRouterDelegate = MyRouterDelegate(authRepository);
     myRouteInformationParser = MyRouteInformationParser();
@@ -48,7 +51,8 @@ class _MyAppState extends State<MyApp> {
         providers: [
           ChangeNotifierProvider(
               create: (_) => authProvider),
-          ChangeNotifierProvider(create: (_) => storyProvider)
+          ChangeNotifierProvider(create: (_) => storyProvider),
+          ChangeNotifierProvider(create: (_) => pageManager),
         ],
       child: defaultTargetPlatform == TargetPlatform.iOS
         ? iOSScaffold()

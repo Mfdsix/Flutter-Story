@@ -61,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
               const VMargin(),
               TextFormField(
                 controller: passwordController,
+                obscureText: true,
                 decoration: const InputDecoration(
                     hintText: "Password"
                 ),
@@ -92,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     }
               }, child: const Text("Login"),),
-              OutlinedButton(onPressed: () => widget.onRegister, child: const Text("Register"))
+              OutlinedButton(onPressed: widget.onRegister, child: const Text("Register"))
             ],
           ),
         ));
