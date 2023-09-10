@@ -14,10 +14,12 @@ class DicodingStoryService {
   static const String _baseUrl = "https://story-api.dicoding.dev/v1";
 
   Future<bool> postRegister(RegisterRequest body) async {
-    final result = await http.post(Uri.parse("$_baseUrl/register"));
+    final result =
+        await http.post(Uri.parse("$_baseUrl/register"), body: body.toJson());
 
-    if(result.statusCode == 200){
+    if (result.statusCode == 201) {
       final response = GeneralResponse.fromJson(json.decode(result.body));
+      print(response.toString());
 
       return !response.error;
     }
@@ -26,9 +28,9 @@ class DicodingStoryService {
   }
 
   Future<User?> postLogin(LoginRequest body) async {
-    final result = await http.post(Uri.parse("$_baseUrl/login"));
+    final result = await http.post(Uri.parse("$_baseUrl/login"), body: body.toJson());
 
-    if(result.statusCode == 200){
+    if (result.statusCode == 200) {
       final response = LoginResponse.fromJson(json.decode(result.body));
 
       return response.loginResult;
@@ -36,26 +38,27 @@ class DicodingStoryService {
 
     return null;
   }
-  
-  Future<List<Story>?> getAllStories(String token) async {
-    final result = await http.get(Uri.parse("$_baseUrl/stories"), headers: {
-      HttpHeaders.authorizationHeader: "Bearer $token"
-    });
 
-    if(result.statusCode == 200){
+  Future<List<Story>?> getAllStories(String token) async {
+    final result = await http.get(Uri.parse("$_baseUrl/stories"),
+        headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
+
+    if (result.statusCode == 200) {
       final response = GetAllStoryResponse.fromJson(json.decode(result.body));
-      
+
       return response.listStory;
     }
-    
+
     return null;
   }
-  
-  Future<bool> postStory(String token, PostStoryFileRequest fileBody, PostStoryBodyRequest body) async {
+
+  Future<bool> postStory(String token, PostStoryFileRequest fileBody,
+      PostStoryBodyRequest body) async {
     final uri = Uri.parse("$_baseUrl/stories");
     final request = http.MultipartRequest('POST', uri);
 
-    final file = http.MultipartFile.fromBytes("photo", fileBody.fileBytes, filename: fileBody.filename);
+    final file = http.MultipartFile.fromBytes("photo", fileBody.fileBytes,
+        filename: fileBody.filename);
     final Map<String, String> fields = {
       "description": body.description,
       "lat": body.lat.toString(),
@@ -72,7 +75,7 @@ class DicodingStoryService {
 
     final http.StreamedResponse result = await request.send();
 
-    if(result.statusCode == 200){
+    if (result.statusCode == 201) {
       final Uint8List responseList = await result.stream.toBytes();
       final String responseString = String.fromCharCodes(responseList);
       final response = GeneralResponse.fromJson(json.decode(responseString));
@@ -84,12 +87,12 @@ class DicodingStoryService {
   }
 
   Future<detail.Story?> getStoryById(String token, String storyId) async {
-    final result = await http.get(Uri.parse("$_baseUrl/stories/$storyId"), headers: {
-      HttpHeaders.authorizationHeader: "Bearer $token"
-    });
+    final result = await http.get(Uri.parse("$_baseUrl/stories/$storyId"),
+        headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
 
-    if(result.statusCode == 200){
-      final response = detail.DetailStoryResponse.fromJson(json.decode(result.body));
+    if (result.statusCode == 200) {
+      final response =
+          detail.DetailStoryResponse.fromJson(json.decode(result.body));
 
       return response.story;
     }

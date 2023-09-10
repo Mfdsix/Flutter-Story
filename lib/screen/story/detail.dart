@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/detail_story.dart';
 import 'package:puth_story/provider/auth_provider.dart';
@@ -15,14 +14,18 @@ class DetailStoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<AuthProvider>(
+        builder: (context, state, _) {
+          if (state.user != null) {
+            final storyProvider = Provider.of<StoryProvider>(context, listen: false);
+            storyProvider.fetchDetail(state.user?.token ?? "-", storyId);
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final user = authProvider.user;
-    final storyProvider = Provider.of<StoryProvider>(context, listen: false);
-    storyProvider.fetchDetail(user?.token ?? "-", storyId);
-
-    return PlatformScaffold(
-        title: "Puth Story", child: _storyListener(context, storyProvider),);
+            return PlatformScaffold(
+              title: "Puth Story", child: _storyListener(context, storyProvider),);
+          } else {
+    return Container();
+          }
+        });
   }
 
   Widget _storyListener(BuildContext context, StoryProvider provider){

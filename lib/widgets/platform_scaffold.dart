@@ -22,16 +22,18 @@ class PlatformScaffold extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
+        preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           centerTitle: true,
-          toolbarHeight: 150,
           title: Text(title),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: child,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: child
+          ),
         ),
       ),
     );

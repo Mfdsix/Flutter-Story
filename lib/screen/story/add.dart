@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:puth_story/model/api/login.dart';
 import 'package:puth_story/model/api/post_story.dart';
 import 'package:puth_story/provider/auth_provider.dart';
 import 'package:puth_story/provider/story_provider.dart';
 import 'package:puth_story/routes/page_manager.dart';
-import 'package:puth_story/screen/camera.dart';
 import 'package:puth_story/utils/image_compress.dart';
 import 'package:puth_story/utils/result_state.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';
@@ -32,70 +32,80 @@ class _StoryAddPageState extends State<StoryAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-        title: "Create Story",
-        child: Column(
-          children: [
-            _previewImage(),
-            const VMargin(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                    onPressed: () => _onGalleryView(),
-                    child: const Text("Open Gallery")),
-                ElevatedButton(
-                    onPressed: () => _onCameraView(),
-                    child: const Text("Open Camera")),
-              ],
-            ),
-            const VMargin(),
-            Form(
-              key: ValueKey(formKey),
-              child: Column(
-                children: [
-                  TextFormField(
-                    maxLines: 5,
-                    controller: descriptionController,
-                    decoration: const InputDecoration(hintText: "Description"),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Description must be filled';
-                      }
-                      if (value.length < 10) {
-                        return 'Description is not valid';
-                      }
+    return Consumer<AuthProvider>(
+        builder: (context, state, _) {
+          if (state.user != null) {
+            return PlatformScaffold(
+                title: "Create Story",
+                child: Column(
+                  children: [
+                    _previewImage(),
+                    const VMargin(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () => _onGalleryView(),
+                            child: const Text("Open Gallery")),
+                        ElevatedButton(
+                            onPressed: () => _onCameraView(),
+                            child: const Text("Open Camera")),
+                      ],
+                    ),
+                    const VMargin(),
+                    Form(
+                      key: ValueKey(formKey),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            maxLines: 5,
+                            controller: descriptionController,
+                            decoration: const InputDecoration(
+                                hintText: "Description"),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Description must be filled';
+                              }
+                              if (value.length < 10) {
+                                return 'Description is not valid';
+                              }
 
-                      return null;
-                    },
-                  ),
-                  const VMargin(),
-                  Consumer<StoryProvider>(
-                    builder: (context, provider, _) {
-                      switch (provider.state) {
-                        case ResultState.loading:
-                          return OutlinedButton(
-                            onPressed: () {},
-                            child: const CircularProgressIndicator(),
-                          );
-                        default:
-                          return ElevatedButton(
-                            onPressed: () => {
-                              if(formKey.currentState!.validate()){
-                                _postStory(context, provider)
+                              return null;
+                            },
+                          ),
+                          const VMargin(),
+                          Consumer<StoryProvider>(
+                            builder: (context, provider, _) {
+                              switch (provider.state) {
+                                case ResultState.loading:
+                                  return OutlinedButton(
+                                    onPressed: () {},
+                                    child: const CircularProgressIndicator(),
+                                  );
+                                default:
+                                  return ElevatedButton(
+                                    onPressed: () =>
+                                    {
+                                      if(formKey.currentState!.validate()){
+                                        _postStory(state.user, provider)
+                                      }
+                                    },
+                                    child: const Text("Post"),
+                                  );
                               }
                             },
-                            child: const Text("Post"),
-                          );
-                      }
-                    },
-                  )
-                ],
-              ),
-            ),
-          ],
-        ));
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ));
+          } else {
+            return Container();
+          }
+        }
+        );
   }
 
   Widget _previewImage() {
@@ -139,11 +149,8 @@ class _StoryAddPageState extends State<StoryAddPage> {
     }
   }
 
-  _postStory(BuildContext context, StoryProvider provider) async {
+  _postStory(User? user, StoryProvider provider) async {
     if (imageFile == null) return;
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final user = authProvider.user;
 
     final fileBytes = await imageFile!.readAsBytes();
     final compressedBytes = await resizeImage(fileBytes);

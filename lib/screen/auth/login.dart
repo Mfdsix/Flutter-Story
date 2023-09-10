@@ -90,6 +90,10 @@ class _LoginPageState extends State<LoginPage> {
                         widget.onLogin();
                       }else{
                         widget.onError("Wrong Email or Password");
+                        // showPlatformAlert(context, "Wrong Email or Password");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Wrong Email or Password"))
+                        );
                       }
                     }
               }, child: const Text("Login"),),

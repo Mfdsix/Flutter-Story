@@ -110,6 +110,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           widget.onRegister();
                         } else {
                           widget.onError("Registration Failed");
+                          // showPlatformAlert(context, "Registration Failed");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Registration Failed"))
+                          );
                         }
                       }
                     },
