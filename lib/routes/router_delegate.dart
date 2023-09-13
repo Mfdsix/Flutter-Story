@@ -104,7 +104,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
             isCamera = false;
             notifyListeners();
           })),
-        if (isCreateStory == true)
+        if (isCamera == false && isCreateStory == true)
           _platformPage(
               "createStoryPage",
               StoryAddPage(

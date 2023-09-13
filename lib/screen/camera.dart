@@ -113,9 +113,9 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   Future<void> _onCameraButtonClick() async {
     final image = await controller?.takePicture();
+    _returnData(image);
 
     widget.onSend();
-    _returnData(image);
   }
 
   void _returnData(XFile? image) async {

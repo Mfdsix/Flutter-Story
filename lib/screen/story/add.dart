@@ -138,7 +138,12 @@ class _StoryAddPageState extends State<StoryAddPage> {
     final XFile? resultImageFile =
         await context.read<PageManager>().waitForResult();
 
+    print(resultImageFile);
+
     if (resultImageFile != null) {
+      // sepertinya gagal di set state, tapi gatau harus diapakan
+      print(resultImageFile);
+      print(resultImageFile.path);
       setState(() {
         imageFile = resultImageFile;
         imagePath = resultImageFile.path;
@@ -147,7 +152,11 @@ class _StoryAddPageState extends State<StoryAddPage> {
   }
 
   _postStory(BuildContext context, StoryProvider provider) async {
-    if (imageFile == null) return;
+    if (imageFile == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Please choose image")));
+      return;
+    }
 
     final fileBytes = await imageFile!.readAsBytes();
     final compressedBytes = await resizeImage(fileBytes);
@@ -156,12 +165,11 @@ class _StoryAddPageState extends State<StoryAddPage> {
         fileBytes: compressedBytes, filename: imageFile!.name);
     final body = PostStoryBodyRequest(description: descriptionController.text);
 
-    final isUploaded =
-        await provider.postStory(fileBody, body);
+    final isUploaded = await provider.postStory(fileBody, body);
 
     if (isUploaded == false) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(provider.message ?? "Failed to Add Story")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(provider.message ?? "Failed to Add Story")));
     }
 
     if (isUploaded) widget.onUploaded();
