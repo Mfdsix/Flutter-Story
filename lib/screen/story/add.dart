@@ -32,6 +32,15 @@ class _StoryAddPageState extends State<StoryAddPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final pageManager = context.read<PageManager>();
+    if(pageManager.file != null){
+      setState(() {
+        imageFile = pageManager.file;
+        imagePath = pageManager.file?.path;
+      });
+    }
+
     return PlatformScaffold(
       title: "Create Story",
       child: SingleChildScrollView(
@@ -75,7 +84,7 @@ class _StoryAddPageState extends State<StoryAddPage> {
                   const VMargin(),
                   Consumer<StoryProvider>(
                     builder: (context, provider, _) {
-                      switch (provider.state) {
+                      switch (provider.postState) {
                         case ResultState.loading:
                           return OutlinedButton(
                             onPressed: () {},
@@ -135,20 +144,9 @@ class _StoryAddPageState extends State<StoryAddPage> {
     final cameras = await availableCameras();
     widget.onOpenCamera(cameras);
 
-    final XFile? resultImageFile =
-        await context.read<PageManager>().waitForResult();
+    if(!mounted) return;
+    await context.read<PageManager>().waitForResult();
 
-    print(resultImageFile);
-
-    if (resultImageFile != null) {
-      // sepertinya gagal di set state, tapi gatau harus diapakan
-      print(resultImageFile);
-      print(resultImageFile.path);
-      setState(() {
-        imageFile = resultImageFile;
-        imagePath = resultImageFile.path;
-      });
-    }
   }
 
   _postStory(BuildContext context, StoryProvider provider) async {
@@ -168,10 +166,18 @@ class _StoryAddPageState extends State<StoryAddPage> {
     final isUploaded = await provider.postStory(fileBody, body);
 
     if (isUploaded == false) {
+      if(!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(provider.message ?? "Failed to Add Story")));
+    }else{
+      widget.onUploaded();
     }
+  }
 
-    if (isUploaded) widget.onUploaded();
+  @override
+  void dispose() {
+    context.read<PageManager>().removeFile();
+
+    super.dispose();
   }
 }

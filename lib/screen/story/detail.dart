@@ -5,15 +5,28 @@ import 'package:puth_story/provider/story_provider.dart';
 import 'package:puth_story/utils/result_state.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';
 
-class DetailStoryPage extends StatelessWidget {
+class DetailStoryPage extends StatefulWidget {
   final String storyId;
 
   const DetailStoryPage({super.key, required this.storyId});
 
   @override
+  State<DetailStoryPage> createState() => _DetailStoryPageState();
+}
+
+class _DetailStoryPageState extends State<DetailStoryPage> {
+
+  @override
+  void initState() {
+    Future.microtask(() => context.read<StoryProvider>().fetchDetail(widget.storyId));
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final storyProvider = Provider.of<StoryProvider>(context, listen: false);
-    storyProvider.fetchDetail(storyId);
+    storyProvider.fetchDetail(widget.storyId);
 
     return PlatformScaffold(
       title: "Puth Story",
@@ -25,7 +38,7 @@ class DetailStoryPage extends StatelessWidget {
 
   Widget _storyListener(BuildContext context) {
     return Consumer<StoryProvider>(builder: (context, provider, _) {
-      switch (provider.state) {
+      switch (provider.getByIdState) {
         case ResultState.hasData:
           return _storyDetail(context, provider.data!);
         case ResultState.error:

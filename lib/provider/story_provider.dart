@@ -10,34 +10,35 @@ class StoryProvider extends ChangeNotifier{
   final DicodingStoryService apiService;
   final AuthRepository authRepository;
 
-  StoryProvider({required this.apiService, required this.authRepository}){
-    _fetchData();
-  }
+  StoryProvider({required this.apiService, required this.authRepository});
 
-  ResultState state = ResultState.standBy;
+  ResultState getAllState = ResultState.standBy;
+  ResultState getByIdState = ResultState.standBy;
+  ResultState postState = ResultState.standBy;
+
   List<Story> list = [];
   detail.Story? data;
   String? message;
 
-  Future<dynamic> _fetchData() async {
-    state = ResultState.loading;
+  Future<dynamic> fetchData() async {
+    getAllState = ResultState.loading;
     notifyListeners();
 
     final token = await authRepository.getUserToken();
     final response = await apiService.getAllStories(token);
 
     if(response == null){
-      state = ResultState.error;
+      getAllState = ResultState.error;
       message = "Failed to load stories";
       return notifyListeners();
     }
     else if(response.isEmpty){
-      state = ResultState.noData;
+      getAllState = ResultState.noData;
       message = "No stories found";
       return notifyListeners();
     }
 
-    state = ResultState.hasData;
+    getAllState = ResultState.hasData;
     list = response;
 
     notifyListeners();
@@ -45,19 +46,19 @@ class StoryProvider extends ChangeNotifier{
   }
 
   Future<dynamic> fetchDetail(String storyId) async {
-    state = ResultState.loading;
+    getByIdState = ResultState.loading;
     notifyListeners();
 
     final token = await authRepository.getUserToken();
     final response = await apiService.getStoryById(token, storyId);
 
     if(response == null){
-      state = ResultState.error;
+      getByIdState = ResultState.error;
       message = "Story not found";
       return notifyListeners();
     }
 
-    state = ResultState.hasData;
+    getByIdState = ResultState.hasData;
     data = response;
 
     notifyListeners();
@@ -65,20 +66,21 @@ class StoryProvider extends ChangeNotifier{
   }
 
   Future<dynamic> postStory(PostStoryFileRequest fileBody, PostStoryBodyRequest body) async {
-    state = ResultState.loading;
+    postState = ResultState.loading;
     notifyListeners();
 
     final token = await authRepository.getUserToken();
     final response = await apiService.postStory(token, fileBody, body);
 
     if(response == true){
-      state = ResultState.hasData;
-      _fetchData();
+      postState = ResultState.hasData;
+      notifyListeners();
+      fetchData();
 
-      return notifyListeners();
+      return true;
     }
 
-    state = ResultState.error;
+    postState = ResultState.error;
     message = "Failed to add Story";
     notifyListeners();
 

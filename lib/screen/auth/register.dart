@@ -119,12 +119,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
                             if (result) {
                               widget.onRegister();
+
+                              if(!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text("Registration Success")));
                             } else {
                               widget.onError("Registration Failed");
                               // showPlatformAlert(context, "Registration Failed");
+                              if(!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       content: Text(provider.message ??

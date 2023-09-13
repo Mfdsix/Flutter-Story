@@ -147,10 +147,13 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
 
         if (!didPop) return false;
 
+        if(isCamera == false){
+          isCreateStory = false;
+        }
+
         isRegister = false;
         selectedStoryId = null;
         isCamera = false;
-        isCreateStory = false;
 
         notifyListeners();
 

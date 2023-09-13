@@ -24,6 +24,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  @override
+  void initState() {
+    Future.microtask(() => context.read<StoryProvider>().fetchData());
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -54,7 +62,7 @@ class _HomePageState extends State<HomePage> {
   Widget _storyListener() {
     return Consumer<StoryProvider>(
       builder: (context, provider, _) {
-        switch (provider.state) {
+        switch (provider.getAllState) {
           case ResultState.hasData:
             return Flexible(
               child: ListView.builder(

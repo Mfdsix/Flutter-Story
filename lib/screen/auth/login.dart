@@ -96,6 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                     }else{
                       widget.onError("Wrong Email or Password");
                       // showPlatformAlert(context, "Wrong Email or Password");
+                      if(!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(provider.message ?? "Wrong Email or Password"))
                       );
