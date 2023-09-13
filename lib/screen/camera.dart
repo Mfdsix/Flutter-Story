@@ -5,8 +5,9 @@ import 'package:puth_story/routes/page_manager.dart';
 
 class CameraPage extends StatefulWidget {
   final Function() onSend;
+  final List<CameraDescription> cameras;
 
-  const CameraPage({super.key, required this.onSend});
+  const CameraPage({super.key, required this.onSend, required this.cameras});
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -17,25 +18,20 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   bool _isCameraInitialized = false;
   CameraController? controller;
   bool _isBackCameraSelected = true;
-  List<CameraDescription> cameras = [];
 
   @override
-  void initState() async {
-    cameras = await availableCameras();
-
+  void initState() {
     WidgetsBinding.instance.addObserver(this);
-    onNewCameraSelected(cameras.first);
+    onNewCameraSelected(widget.cameras.first);
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: ThemeData.dark(),
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
-          title: const Text("Ambil Gambar"),
+          title: const Text("Take Photo"),
           actions: [
             IconButton(
               onPressed: () => _onCameraSwitch(),
@@ -57,7 +53,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -128,14 +123,14 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   }
 
   void _onCameraSwitch() {
-    if (cameras.length == 1) return;
+    if (widget.cameras.length == 1) return;
 
     setState(() {
       _isCameraInitialized = false;
     });
 
     onNewCameraSelected(
-      cameras[_isBackCameraSelected ? 1 : 0],
+      widget.cameras[_isBackCameraSelected ? 1 : 0],
     );
 
     setState(() {

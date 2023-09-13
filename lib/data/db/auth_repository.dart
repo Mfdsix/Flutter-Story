@@ -26,6 +26,11 @@ class AuthRepository{
     return user != null && user != "{}" ? User.fromJson(json.decode(user)) : null;
   }
 
+  Future<String?> getUserToken() async {
+    final user = await getUser();
+    return user?.token;
+  }
+
   Future logout() async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setString(userKey, "{}");

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/login.dart';
 import 'package:puth_story/provider/auth_provider.dart';
+import 'package:puth_story/utils/result_state.dart';
 import 'package:puth_story/utils/validator.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';
 import 'package:puth_story/widgets/v_margin.dart';
@@ -36,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return PlatformScaffold(
         title: "Login",
+        child: SingleChildScrollView(
         child: Form(
           key: formKey,
           child: Column(
@@ -79,27 +81,34 @@ class _LoginPageState extends State<LoginPage> {
               const VMargin(
                 height: 20.0,
               ),
-              context.watch<AuthProvider>().isLoadingLogin
-              ? OutlinedButton(onPressed: (){}, child: const CircularProgressIndicator())
-                  : ElevatedButton(onPressed: () async {
-                    if(formKey.currentState!.validate()){
-                      final reqBody = LoginRequest(email: emailController.text, password: passwordController.text);
-                      final result = await context.read<AuthProvider>().login(reqBody);
+              Consumer<AuthProvider>(builder: (context, provider, _) {
+                switch(provider.state){
+                  case ResultState.loading:
+                      return OutlinedButton(onPressed: (){}, child: const CircularProgressIndicator());
+                  default:
+                return  ElevatedButton(onPressed: () async {
+                  if(formKey.currentState!.validate()){
+                    final reqBody = LoginRequest(email: emailController.text, password: passwordController.text);
+                    final result = await context.read<AuthProvider>().login(reqBody);
 
-                      if(result){
-                        widget.onLogin();
-                      }else{
-                        widget.onError("Wrong Email or Password");
-                        // showPlatformAlert(context, "Wrong Email or Password");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Wrong Email or Password"))
-                        );
-                      }
+                    if(result){
+                      widget.onLogin();
+                    }else{
+                      widget.onError("Wrong Email or Password");
+                      // showPlatformAlert(context, "Wrong Email or Password");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(provider.message ?? "Wrong Email or Password"))
+                      );
                     }
-              }, child: const Text("Login"),),
+                  }
+                }, child: const Text("Login"),);
+                }
+              }),
               OutlinedButton(onPressed: widget.onRegister, child: const Text("Register"))
             ],
           ),
-        ));
+        ),
+        ),
+    );
   }
 }

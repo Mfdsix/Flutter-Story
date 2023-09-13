@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp> {
     final apiService = DicodingStoryService();
 
     authProvider = AuthProvider(authRepository: authRepository, apiService: apiService);
-    storyProvider = StoryProvider(apiService: apiService);
+    storyProvider = StoryProvider(apiService: apiService, authRepository: authRepository);
     pageManager = PageManager();
 
     myRouterDelegate = MyRouterDelegate(authRepository);

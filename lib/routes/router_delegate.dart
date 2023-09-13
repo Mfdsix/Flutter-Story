@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,6 @@ import 'package:puth_story/screen/splash.dart';
 import 'package:puth_story/screen/story/add.dart';
 import 'package:puth_story/screen/story/detail.dart';
 import 'package:puth_story/screen/unknown.dart';
-import 'package:puth_story/widgets/platform_alert.dart';
 
 class MyRouterDelegate extends RouterDelegate<PageConfiguration>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
@@ -40,6 +40,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
   bool? isLoggedIn;
   bool isRegister = false;
   bool isCreateStory = false;
+  List<CameraDescription> listCamera = [];
 
   List<Page> get _unknownStack => [
         _platformPage("unknownPage", UnknownPage(
@@ -97,7 +98,9 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
               },
             )),
         if (isCamera == true)
-          _platformPage("cameraPage", CameraPage(onSend: () {
+          _platformPage("cameraPage", CameraPage(
+              cameras: listCamera,
+              onSend: () {
             isCamera = false;
             notifyListeners();
           })),
@@ -105,8 +108,9 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
           _platformPage(
               "createStoryPage",
               StoryAddPage(
-                onOpenCamera: () {
+                onOpenCamera: (List<CameraDescription> cameras) {
                   isCamera = true;
+                  listCamera = cameras;
                   notifyListeners();
                 },
                 onUploaded: () {
@@ -146,6 +150,8 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
         isRegister = false;
         selectedStoryId = null;
         isCamera = false;
+        isCreateStory = false;
+
         notifyListeners();
 
         return true;
@@ -163,12 +169,14 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
       return PageConfiguration.login();
     } else if (isUnknown == true) {
       return PageConfiguration.unknown();
-    } else if (selectedStoryId == null && isCreateStory == false) {
+    } else if (isLoggedIn == true && selectedStoryId == null && isCreateStory == false) {
       return PageConfiguration.home();
     } else if (selectedStoryId == null && isCreateStory == true) {
       return PageConfiguration.createStory();
     } else if (selectedStoryId != null) {
       return PageConfiguration.detailStory(selectedStoryId!);
+    } else if(isCamera == true){
+      return PageConfiguration.openCamera();
     } else {
       return null;
     }
@@ -192,6 +200,8 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
       isCreateStory = true;
     } else if (configuration.isDetailStoryPage) {
       selectedStoryId = configuration.storyId.toString();
+    }else if (configuration.isCameraPage){
+      isCamera = true;
     } else {
       print("New route is invalid");
     }

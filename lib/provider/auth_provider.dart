@@ -3,6 +3,7 @@ import 'package:puth_story/data/api/dicoding_story_service.dart';
 import 'package:puth_story/data/db/auth_repository.dart';
 import 'package:puth_story/model/api/login.dart';
 import 'package:puth_story/model/api/register.dart';
+import 'package:puth_story/utils/result_state.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepository authRepository;
@@ -12,15 +13,13 @@ class AuthProvider extends ChangeNotifier {
     _getUser();
   }
 
-  bool isLoadingLogin = false;
-  bool isLoadingLogout = false;
-  bool isLoadingRegister = false;
-  String message = "";
+  ResultState state = ResultState.standBy;
+  String? message;
   bool isLoggedIn = false;
   User? user;
 
   Future<bool> login(LoginRequest reqBody) async {
-    isLoadingLogin = true;
+    state = ResultState.loading;
     notifyListeners();
 
     final response = await apiService.postLogin(reqBody);
@@ -30,10 +29,18 @@ class AuthProvider extends ChangeNotifier {
 
     isLoggedIn = await authRepository.isLoggedIn();
 
-    isLoadingLogin = false;
+    if(isLoggedIn){
+      state = ResultState.hasData;
+      notifyListeners();
+
+      return true;
+    }
+
+    state = ResultState.error;
+    message = "Wrong username or password";
     notifyListeners();
 
-    return isLoggedIn;
+    return false;
   }
 
   Future _getUser() async {
@@ -43,25 +50,33 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> register(RegisterRequest reqBody) async {
-    isLoadingRegister = true;
+    state = ResultState.loading;
     notifyListeners();
 
     final isRegistered = await apiService.postRegister(reqBody);
 
-    isLoadingRegister = false;
+    if(isRegistered){
+      state = ResultState.hasData;
+      notifyListeners();
+
+      return true;
+    }
+
+    state = ResultState.error;
+    message = "Failed to register";
     notifyListeners();
 
-    return isRegistered;
+    return false;
   }
 
   Future logout() async {
-    isLoadingLogout = true;
+    state = ResultState.loading;
     notifyListeners();
 
     await authRepository.logout();
     isLoggedIn = await authRepository.isLoggedIn();
 
-    isLoadingLogout = false;
+    state = ResultState.hasData;
     notifyListeners();
   }
 }

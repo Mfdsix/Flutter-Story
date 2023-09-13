@@ -17,6 +17,9 @@ class DicodingStoryService {
     final result =
         await http.post(Uri.parse("$_baseUrl/register"), body: body.toJson());
 
+    print(result.statusCode);
+    print(json.decode(result.body));
+
     if (result.statusCode == 201) {
       final response = GeneralResponse.fromJson(json.decode(result.body));
       print(response.toString());
@@ -39,7 +42,7 @@ class DicodingStoryService {
     return null;
   }
 
-  Future<List<Story>?> getAllStories(String token) async {
+  Future<List<Story>?> getAllStories(String? token) async {
     final result = await http.get(Uri.parse("$_baseUrl/stories"),
         headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
 
@@ -52,7 +55,7 @@ class DicodingStoryService {
     return null;
   }
 
-  Future<bool> postStory(String token, PostStoryFileRequest fileBody,
+  Future<bool> postStory(String? token, PostStoryFileRequest fileBody,
       PostStoryBodyRequest body) async {
     final uri = Uri.parse("$_baseUrl/stories");
     final request = http.MultipartRequest('POST', uri);
@@ -61,17 +64,23 @@ class DicodingStoryService {
         filename: fileBody.filename);
     final Map<String, String> fields = {
       "description": body.description,
-      "lat": body.lat.toString(),
-      "lon": body.lon.toString()
     };
+
+    if(body.lat != null){
+      fields['lat'] = body.lat.toString();
+    }
+    if(body.lon != null){
+      fields['lon'] = body.lon.toString();
+    }
+
     final Map<String, String> headers = {
       "Content-type": "multipart/form-data",
-      "Authorization": "Bearer $token}"
+      "Authorization": "Bearer $token"
     };
 
     request.files.add(file);
     request.fields.addAll(fields);
-    request.fields.addAll(headers);
+    request.headers.addAll(headers);
 
     final http.StreamedResponse result = await request.send();
 
@@ -86,7 +95,7 @@ class DicodingStoryService {
     return false;
   }
 
-  Future<detail.Story?> getStoryById(String token, String storyId) async {
+  Future<detail.Story?> getStoryById(String? token, String storyId) async {
     final result = await http.get(Uri.parse("$_baseUrl/stories/$storyId"),
         headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
 

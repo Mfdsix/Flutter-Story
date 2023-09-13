@@ -29,11 +29,9 @@ class PlatformScaffold extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
+        child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: child
-          ),
         ),
       ),
     );
