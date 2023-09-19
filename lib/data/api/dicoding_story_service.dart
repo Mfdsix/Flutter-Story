@@ -42,8 +42,8 @@ class DicodingStoryService {
     return null;
   }
 
-  Future<List<Story>?> getAllStories(String? token) async {
-    final result = await http.get(Uri.parse("$_baseUrl/stories"),
+  Future<List<Story>?> getAllStories(String? token, Map<String, dynamic>? parameters) async {
+    final result = await http.get(Uri.parse("$_baseUrl/stories").replace(queryParameters: parameters),
         headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
 
     if (result.statusCode == 200) {

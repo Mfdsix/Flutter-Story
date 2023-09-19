@@ -24,10 +24,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
-    Future.microtask(() => context.read<StoryProvider>().fetchData());
+    final apiProvider = context.read<StoryProvider>();
+    Future.microtask(() => apiProvider.fetchData());
+
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent) {
+        if(apiProvider.page != null){
+          apiProvider.fetchData();
+        }
+      }
+    });
 
     super.initState();
   }
@@ -66,9 +77,19 @@ class _HomePageState extends State<HomePage> {
           case ResultState.hasData:
             return Flexible(
               child: ListView.builder(
+                controller: scrollController,
                 shrinkWrap: true,
-                itemCount: provider.list.length,
+                itemCount: provider.list.length + (provider.page != null ? 1 : 0),
                 itemBuilder: (context, index) {
+                  if (index == provider.list.length && provider.page != null) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
                   return _storyItem(context, provider.list[index]);
                 },
               ),
@@ -127,5 +148,12 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+
+    super.dispose();
   }
 }

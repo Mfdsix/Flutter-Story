@@ -17,15 +17,23 @@ class StoryProvider extends ChangeNotifier{
   ResultState postState = ResultState.standBy;
 
   List<Story> list = [];
+  int? page = 1;
+  int pageSize = 10;
+
   detail.Story? data;
   String? message;
 
   Future<dynamic> fetchData() async {
-    getAllState = ResultState.loading;
-    notifyListeners();
+    if(page == 1){
+      getAllState = ResultState.loading;
+      notifyListeners();
+    }
 
     final token = await authRepository.getUserToken();
-    final response = await apiService.getAllStories(token);
+    final response = await apiService.getAllStories(token, {
+      "page": page,
+      "limit": pageSize
+    });
 
     if(response == null){
       getAllState = ResultState.error;
@@ -40,6 +48,12 @@ class StoryProvider extends ChangeNotifier{
 
     getAllState = ResultState.hasData;
     list = response;
+
+    if(response.length < pageSize){
+      page = null;
+    }else{
+      page = page! + 1;
+    }
 
     notifyListeners();
     return list;

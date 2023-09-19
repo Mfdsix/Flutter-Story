@@ -70,6 +70,15 @@ class _StoryAddPageState extends State<StoryAddPage> {
               ],
             ),
             const VMargin(),
+            CheckboxListTile(
+              value: storyLocation != null,
+              onChanged: (bool? value){
+                if(value == true){
+                  _onReadLocation();
+                }
+              }
+            ),
+            const VMargin(),
             Form(
               key: formKey,
               child: Column(
