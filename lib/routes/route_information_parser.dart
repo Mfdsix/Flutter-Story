@@ -19,6 +19,8 @@ class MyRouteInformationParser extends RouteInformationParser<PageConfiguration>
         return PageConfiguration.home();
       }else if(first == 'camera'){
         return PageConfiguration.openCamera();
+      }else if(first == 'location'){
+        return PageConfiguration.openLocation();
       }
     }else if(uri.pathSegments.length == 2){
       final first = uri.pathSegments[0].toLowerCase();
@@ -60,6 +62,8 @@ class MyRouteInformationParser extends RouteInformationParser<PageConfiguration>
       return RouteInformation(location: "/auth/${configuration.storyId}");
     } else if(configuration.isCameraPage){
       return const RouteInformation(location: "/camera");
+    } else if(configuration.isLocationPage){
+      return const RouteInformation(location: "/location");
     }else{
       return null;
     }

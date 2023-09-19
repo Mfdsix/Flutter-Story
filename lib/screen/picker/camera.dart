@@ -119,7 +119,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   }
 
   void _returnData(XFile? image) async {
-    context.read<PageManager>().returnData(image);
+    context.read<PageManager>().returnCameraData(image);
   }
 
   void _onCameraSwitch() {

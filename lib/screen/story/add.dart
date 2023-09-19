@@ -14,10 +14,11 @@ import 'package:puth_story/widgets/v_margin.dart';
 
 class StoryAddPage extends StatefulWidget {
   final Function(List<CameraDescription> cameras) onOpenCamera;
+  final Function() onOpenLocation;
   final Function() onUploaded;
 
   const StoryAddPage(
-      {super.key, required this.onOpenCamera, required this.onUploaded});
+      {super.key, required this.onOpenCamera, required this.onUploaded, required this.onOpenLocation});
 
   @override
   State<StoryAddPage> createState() => _StoryAddPageState();
@@ -145,7 +146,7 @@ class _StoryAddPageState extends State<StoryAddPage> {
     widget.onOpenCamera(cameras);
 
     if(!mounted) return;
-    await context.read<PageManager>().waitForResult();
+    await context.read<PageManager>().waitForCameraResult();
 
   }
 
@@ -176,7 +177,7 @@ class _StoryAddPageState extends State<StoryAddPage> {
 
   @override
   void dispose() {
-    context.read<PageManager>().removeFile();
+    context.read<PageManager>().removeCameraFile();
 
     super.dispose();
   }

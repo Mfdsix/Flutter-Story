@@ -6,8 +6,9 @@ import 'package:puth_story/data/db/auth_repository.dart';
 import 'package:puth_story/model/page_configuration.dart';
 import 'package:puth_story/screen/auth/login.dart';
 import 'package:puth_story/screen/auth/register.dart';
-import 'package:puth_story/screen/camera.dart';
+import 'package:puth_story/screen/picker/camera.dart';
 import 'package:puth_story/screen/home.dart';
+import 'package:puth_story/screen/picker/location.dart';
 import 'package:puth_story/screen/splash.dart';
 import 'package:puth_story/screen/story/add.dart';
 import 'package:puth_story/screen/story/detail.dart';
@@ -20,6 +21,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
 
   bool? isUnknown;
   bool isCamera = false;
+  bool isLocation = false;
   String? selectedStoryId;
   String? alertMessage;
 
@@ -104,6 +106,13 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
             isCamera = false;
             notifyListeners();
           })),
+        if(isLocation == true)
+          _platformPage("locationPage", LocationPage(
+            onSend: () {
+              isLocation = false;
+              notifyListeners();
+            }
+          )),
         if (isCamera == false && isCreateStory == true)
           _platformPage(
               "createStoryPage",
@@ -113,6 +122,10 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
                   listCamera = cameras;
                   notifyListeners();
                 },
+                onOpenLocation: () {
+                  isLocation = true;
+                  notifyListeners();
+  },
                 onUploaded: () {
                   isCreateStory = false;
                   notifyListeners();
@@ -154,6 +167,7 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
         isRegister = false;
         selectedStoryId = null;
         isCamera = false;
+        isLocation = false;
 
         notifyListeners();
 
@@ -180,6 +194,8 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
       return PageConfiguration.detailStory(selectedStoryId!);
     } else if(isCamera == true){
       return PageConfiguration.openCamera();
+    } else if(isLocation == true){
+      return PageConfiguration.openLocation();
     } else {
       return null;
     }
@@ -205,6 +221,8 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
       selectedStoryId = configuration.storyId.toString();
     }else if (configuration.isCameraPage){
       isCamera = true;
+    }else if (configuration.isLocationPage){
+      isLocation = true;
     } else {
       print("New route is invalid");
     }

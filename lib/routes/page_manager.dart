@@ -7,17 +7,17 @@ class PageManager extends ChangeNotifier{
   late Completer<XFile?> _completer;
   XFile? file;
 
-  Future<XFile?> waitForResult() async {
+  Future<XFile?> waitForCameraResult() async {
     _completer = Completer<XFile?>();
     return _completer.future;
   }
 
-  void returnData(XFile? value){
+  void returnCameraData(XFile? value){
     _completer.complete(value);
     file = value;
   }
 
-  void removeFile(){
+  void removeCameraFile(){
     file = null;
   }
 }
