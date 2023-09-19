@@ -75,6 +75,8 @@ class _StoryAddPageState extends State<StoryAddPage> {
               onChanged: (bool? value){
                 if(value == true){
                   _onReadLocation();
+                }else{
+                  storyLocation = null;
                 }
               }
             ),
