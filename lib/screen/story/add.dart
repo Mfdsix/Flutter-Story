@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/post_story.dart';
@@ -27,6 +28,7 @@ class StoryAddPage extends StatefulWidget {
 class _StoryAddPageState extends State<StoryAddPage> {
   XFile? imageFile;
   String? imagePath;
+  LatLng? storyLocation;
 
   final descriptionController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -35,10 +37,15 @@ class _StoryAddPageState extends State<StoryAddPage> {
   Widget build(BuildContext context) {
 
     final pageManager = context.read<PageManager>();
-    if(pageManager.file != null){
+    if(pageManager.cameraFile != null){
       setState(() {
-        imageFile = pageManager.file;
-        imagePath = pageManager.file?.path;
+        imageFile = pageManager.cameraFile;
+        imagePath = pageManager.cameraFile?.path;
+      });
+    }
+    if(pageManager.location != null){
+      setState(() {
+        storyLocation = pageManager.location;
       });
     }
 
@@ -147,7 +154,13 @@ class _StoryAddPageState extends State<StoryAddPage> {
 
     if(!mounted) return;
     await context.read<PageManager>().waitForCameraResult();
+  }
 
+  _onReadLocation() async {
+    widget.onOpenLocation();
+
+    if(!mounted) return;
+    await context.read<PageManager>().waitForLocationResult();
   }
 
   _postStory(BuildContext context, StoryProvider provider) async {
@@ -162,7 +175,11 @@ class _StoryAddPageState extends State<StoryAddPage> {
 
     final fileBody = PostStoryFileRequest(
         fileBytes: compressedBytes, filename: imageFile!.name);
-    final body = PostStoryBodyRequest(description: descriptionController.text);
+    final body = PostStoryBodyRequest(
+        description: descriptionController.text,
+        lat: (storyLocation != null) ? storyLocation!.latitude : null,
+        lon: (storyLocation != null) ? storyLocation!.longitude : null,
+    );
 
     final isUploaded = await provider.postStory(fileBody, body);
 
@@ -178,6 +195,7 @@ class _StoryAddPageState extends State<StoryAddPage> {
   @override
   void dispose() {
     context.read<PageManager>().removeCameraFile();
+    context.read<PageManager>().removeLocation();
 
     super.dispose();
   }

@@ -79,8 +79,6 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
                 alertMessage = message;
                 notifyListeners();
               })),
-//               still working on it
-//         if (alertMessage != null) PlatformAlert(message: alertMessage!),
       ];
   List<Page> get _loggedInStack => [
         _platformPage(
