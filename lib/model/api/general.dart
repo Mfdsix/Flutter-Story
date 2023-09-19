@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'general.g.dart';
 
 GeneralResponse generalResponseFromJson(String str) => GeneralResponse.fromJson(json.decode(str));
 
 String generalResponseToJson(GeneralResponse data) => json.encode(data.toJson());
 
+@JsonSerializable()
 class GeneralResponse {
   bool error;
   String message;
@@ -13,13 +17,6 @@ class GeneralResponse {
     required this.message,
   });
 
-  factory GeneralResponse.fromJson(Map<String, dynamic> json) => GeneralResponse(
-    error: json["error"],
-    message: json["message"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "error": error,
-    "message": message,
-  };
+  factory GeneralResponse.fromJson(Map<String, dynamic> json) => _$GeneralResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$GeneralResponseToJson(this);
 }

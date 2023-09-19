@@ -1,9 +1,13 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert';
+
+part 'detail_story.g.dart';
 
 DetailStoryResponse detailStoryResponseFromJson(String str) => DetailStoryResponse.fromJson(json.decode(str));
 
 String detailStoryResponseToJson(DetailStoryResponse data) => json.encode(data.toJson());
 
+@JsonSerializable()
 class DetailStoryResponse {
   bool error;
   String message;
@@ -15,19 +19,11 @@ class DetailStoryResponse {
     required this.story,
   });
 
-  factory DetailStoryResponse.fromJson(Map<String, dynamic> json) => DetailStoryResponse(
-    error: json["error"],
-    message: json["message"],
-    story: Story.fromJson(json["story"]),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "error": error,
-    "message": message,
-    "story": story.toJson(),
-  };
+  factory DetailStoryResponse.fromJson(Map<String, dynamic> json) => _$DetailStoryResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$DetailStoryResponseToJson(this);
 }
 
+@JsonSerializable()
 class Story {
   String id;
   String name;
@@ -47,23 +43,6 @@ class Story {
     this.lon,
   });
 
-  factory Story.fromJson(Map<String, dynamic> json) => Story(
-    id: json["id"],
-    name: json["name"],
-    description: json["description"],
-    photoUrl: json["photoUrl"],
-    createdAt: DateTime.parse(json["createdAt"]),
-    lat: json["lat"]?.toDouble(),
-    lon: json["lon"]?.toDouble(),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "description": description,
-    "photoUrl": photoUrl,
-    "createdAt": createdAt.toIso8601String(),
-    "lat": lat,
-    "lon": lon,
-  };
+  factory Story.fromJson(Map<String, dynamic> json) => _$StoryFromJson(json);
+  Map<String, dynamic> toJson() => _$StoryToJson(this);
 }
