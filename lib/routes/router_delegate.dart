@@ -97,38 +97,42 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
                 notifyListeners();
               },
             )),
+    if (isCreateStory == true)
+      _platformPage(
+          "createStoryPage",
+          StoryAddPage(
+            onOpenCamera: (List<CameraDescription> cameras) {
+              isCreateStory = false;
+              isCamera = true;
+              listCamera = cameras;
+              notifyListeners();
+            },
+            onOpenLocation: () {
+              isCreateStory = false;
+              isLocation = true;
+              notifyListeners();
+            },
+            onUploaded: () {
+              isCreateStory = false;
+              notifyListeners();
+            },
+          )),
         if (isCamera == true)
-          _platformPage("cameraPage", CameraPage(
-              cameras: listCamera,
-              onSend: () {
-            isCamera = false;
+          _platformPage(
+              "cameraPage",
+              CameraPage(
+                  cameras: listCamera,
+                  onSend: () {
+                    isCamera = false;
+                    isCreateStory = true;
+                    notifyListeners();
+                  })),
+        if (isLocation == true)
+          _platformPage("locationPage", LocationPage(onSend: () {
+            isLocation = false;
+            isCreateStory = true;
             notifyListeners();
           })),
-        if(isLocation == true)
-          _platformPage("locationPage", LocationPage(
-            onSend: () {
-              isLocation = false;
-              notifyListeners();
-            }
-          )),
-        if (isCamera == false && isCreateStory == true)
-          _platformPage(
-              "createStoryPage",
-              StoryAddPage(
-                onOpenCamera: (List<CameraDescription> cameras) {
-                  isCamera = true;
-                  listCamera = cameras;
-                  notifyListeners();
-                },
-                onOpenLocation: () {
-                  isLocation = true;
-                  notifyListeners();
-  },
-                onUploaded: () {
-                  isCreateStory = false;
-                  notifyListeners();
-                },
-              )),
         if (isCreateStory == false && selectedStoryId != null)
           _platformPage(
             "detailStoryPage",
@@ -158,8 +162,10 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
 
         if (!didPop) return false;
 
-        if(isCamera == false){
+        if(isCamera == false && isLocation == false){
           isCreateStory = false;
+        }else{
+          isCreateStory = true;
         }
 
         isRegister = false;
@@ -184,15 +190,17 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
       return PageConfiguration.login();
     } else if (isUnknown == true) {
       return PageConfiguration.unknown();
-    } else if (isLoggedIn == true && selectedStoryId == null && isCreateStory == false) {
+    } else if (isLoggedIn == true &&
+        selectedStoryId == null &&
+        isCreateStory == false) {
       return PageConfiguration.home();
     } else if (selectedStoryId == null && isCreateStory == true) {
       return PageConfiguration.createStory();
     } else if (selectedStoryId != null) {
       return PageConfiguration.detailStory(selectedStoryId!);
-    } else if(isCamera == true){
+    } else if (isCamera == true) {
       return PageConfiguration.openCamera();
-    } else if(isLocation == true){
+    } else if (isLocation == true) {
       return PageConfiguration.openLocation();
     } else {
       return null;
@@ -217,9 +225,9 @@ class MyRouterDelegate extends RouterDelegate<PageConfiguration>
       isCreateStory = true;
     } else if (configuration.isDetailStoryPage) {
       selectedStoryId = configuration.storyId.toString();
-    }else if (configuration.isCameraPage){
+    } else if (configuration.isCameraPage) {
       isCamera = true;
-    }else if (configuration.isLocationPage){
+    } else if (configuration.isLocationPage) {
       isLocation = true;
     } else {
       print("New route is invalid");

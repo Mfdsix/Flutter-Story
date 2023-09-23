@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Paid-Debug" type="FlutterRunConfigurationType" factoryName="Flutter">
+    <option name="additionalArgs" value="--debug" />
+    <option name="buildFlavor" value="paid" />
+    <option name="filePath" value="$PROJECT_DIR$/lib/main_paid.dart" />
+    <method v="2" />
+  </configuration>
+</component>

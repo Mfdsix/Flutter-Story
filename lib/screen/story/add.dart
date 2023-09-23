@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:puth_story/model/api/post_story.dart';
 import 'package:puth_story/provider/story_provider.dart';
 import 'package:puth_story/routes/page_manager.dart';
+import 'package:puth_story/utils/flavor_config.dart';
 import 'package:puth_story/utils/image_compress.dart';
 import 'package:puth_story/utils/result_state.dart';
 import 'package:puth_story/widgets/platform_scaffold.dart';
@@ -19,7 +20,10 @@ class StoryAddPage extends StatefulWidget {
   final Function() onUploaded;
 
   const StoryAddPage(
-      {super.key, required this.onOpenCamera, required this.onUploaded, required this.onOpenLocation});
+      {super.key,
+      required this.onOpenCamera,
+      required this.onUploaded,
+      required this.onOpenLocation});
 
   @override
   State<StoryAddPage> createState() => _StoryAddPageState();
@@ -28,27 +32,33 @@ class StoryAddPage extends StatefulWidget {
 class _StoryAddPageState extends State<StoryAddPage> {
   XFile? imageFile;
   String? imagePath;
+  bool isPostLocation = false;
   LatLng? storyLocation;
 
   final descriptionController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context) {
-
+  void initState() {
     final pageManager = context.read<PageManager>();
-    if(pageManager.cameraFile != null){
+    if (pageManager.cameraFile != null) {
       setState(() {
         imageFile = pageManager.cameraFile;
         imagePath = pageManager.cameraFile?.path;
       });
     }
-    if(pageManager.location != null){
+    if (pageManager.location != null) {
       setState(() {
+        isPostLocation = true;
         storyLocation = pageManager.location;
       });
     }
 
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return PlatformScaffold(
       title: "Create Story",
       child: SingleChildScrollView(
@@ -69,17 +79,29 @@ class _StoryAddPageState extends State<StoryAddPage> {
                     child: const Text("Open Camera")),
               ],
             ),
-            const VMargin(),
-            CheckboxListTile(
-              value: storyLocation != null,
-              onChanged: (bool? value){
-                if(value == true){
-                  _onReadLocation();
-                }else{
-                  storyLocation = null;
-                }
-              }
-            ),
+            if (FlavorConfig.instance.flavor == FlavorType.paid)
+              Column(
+                children: [
+                  const VMargin(),
+                  CheckboxListTile(
+                      title: const Text("Post My Location"),
+                      value: isPostLocation,
+                      onChanged: (bool? value) {
+                        if (value == true) {
+                          _onReadLocation();
+
+                          setState(() {
+                            isPostLocation = true;
+                          });
+                        } else {
+                          setState(() {
+                            isPostLocation = false;
+                            storyLocation = null;
+                          });
+                        }
+                      }),
+                ],
+              ),
             const VMargin(),
             Form(
               key: formKey,
@@ -163,14 +185,14 @@ class _StoryAddPageState extends State<StoryAddPage> {
     final cameras = await availableCameras();
     widget.onOpenCamera(cameras);
 
-    if(!mounted) return;
+    if (!mounted) return;
     await context.read<PageManager>().waitForCameraResult();
   }
 
   _onReadLocation() async {
     widget.onOpenLocation();
 
-    if(!mounted) return;
+    if (!mounted) return;
     await context.read<PageManager>().waitForLocationResult();
   }
 
@@ -187,27 +209,26 @@ class _StoryAddPageState extends State<StoryAddPage> {
     final fileBody = PostStoryFileRequest(
         fileBytes: compressedBytes, filename: imageFile!.name);
     final body = PostStoryBodyRequest(
-        description: descriptionController.text,
-        lat: (storyLocation != null) ? storyLocation!.latitude : null,
-        lon: (storyLocation != null) ? storyLocation!.longitude : null,
+      description: descriptionController.text,
+      lat: (storyLocation != null) ? storyLocation!.latitude : null,
+      lon: (storyLocation != null) ? storyLocation!.longitude : null,
     );
 
     final isUploaded = await provider.postStory(fileBody, body);
 
     if (isUploaded == false) {
-      if(!mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(provider.message ?? "Failed to Add Story")));
-    }else{
+    } else {
+      context.read<PageManager>().removeCameraFile();
+      context.read<PageManager>().removeLocation();
       widget.onUploaded();
     }
   }
 
   @override
   void dispose() {
-    context.read<PageManager>().removeCameraFile();
-    context.read<PageManager>().removeLocation();
-
     super.dispose();
   }
 }

@@ -36,6 +36,13 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   @override
+  void dispose() {
+    mapController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
         title: "Pick Location",
@@ -44,7 +51,6 @@ class _LocationPageState extends State<LocationPage> {
             children: [
               GoogleMap(
                 markers: markers,
-                mapType: MapType.normal,
                 initialCameraPosition:
                     CameraPosition(zoom: 16, target: defaultLocation),
                 onMapCreated: (controller) {
@@ -60,7 +66,7 @@ class _LocationPageState extends State<LocationPage> {
                 zoomControlsEnabled: false,
                 mapToolbarEnabled: false,
               ),
-              if(placemark != null) Positioned(
+              if(markers.isNotEmpty) Positioned(
                 top: 16,
                 right: 16,
                 child: ElevatedButton(
@@ -71,8 +77,8 @@ class _LocationPageState extends State<LocationPage> {
                 ),
               ),
               Positioned(
-                  bottom: 16,
-                  right: 16,
+                  top: 16,
+                  left: 16,
                   child: Column(
                     children: [
                       FloatingActionButton.small(
@@ -101,7 +107,7 @@ class _LocationPageState extends State<LocationPage> {
               ),
               if(placemark == null) const SizedBox()
               else Positioned(
-                bottom: 16,
+                bottom: 36,
                   right: 16,
                   left: 16,
                   child: PlacemarkWidget(
@@ -176,9 +182,14 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   void onSendLocation(){
-    if(markers.length > 1){
+    if(markers.isNotEmpty){
       context.read<PageManager>().returnLocationData(markers.elementAt(0).position);
       widget.onSend();
+    }else{
+      if(!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select location"))
+      );
     }
   }
 }
@@ -211,7 +222,7 @@ class PlacemarkWidget extends StatelessWidget {
               children: [
                 Text(
                   placemark.street!,
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
                   '${placemark.subLocality}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}',

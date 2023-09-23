@@ -10,10 +10,6 @@ import 'package:puth_story/routes/page_manager.dart';
 import 'package:puth_story/routes/route_information_parser.dart';
 import 'package:puth_story/routes/router_delegate.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   static const appTitle = "Puth Story";

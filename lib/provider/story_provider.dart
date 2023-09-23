@@ -29,30 +29,35 @@ class StoryProvider extends ChangeNotifier{
       notifyListeners();
     }
 
+    Map<String, String> params = {};
+    if(page != null) params['page'] = page.toString();
+    params['limit'] = pageSize.toString();
+
     final token = await authRepository.getUserToken();
-    final response = await apiService.getAllStories(token, {
-      "page": page,
-      "limit": pageSize
-    });
+    final response = await apiService.getAllStories(token, params);
 
     if(response == null){
       getAllState = ResultState.error;
       message = "Failed to load stories";
-      return notifyListeners();
-    }
-    else if(response.isEmpty){
-      getAllState = ResultState.noData;
-      message = "No stories found";
-      return notifyListeners();
-    }
-
-    getAllState = ResultState.hasData;
-    list = response;
-
-    if(response.length < pageSize){
+    } else if(response.isEmpty){
+      if(page == 1){
+        getAllState = ResultState.noData;
+        message = "No stories found";
+      }
       page = null;
-    }else{
-      page = page! + 1;
+    } else if(response.isNotEmpty) {
+      getAllState = ResultState.hasData;
+      if(page == 1){
+        list = response;
+      }else{
+        list = list + response;
+      }
+
+      if(response.length < pageSize){
+        page = null;
+      }else{
+        page = page! + 1;
+      }
     }
 
     notifyListeners();
@@ -88,6 +93,7 @@ class StoryProvider extends ChangeNotifier{
 
     if(response == true){
       postState = ResultState.hasData;
+      page = 1;
       notifyListeners();
       fetchData();
 
